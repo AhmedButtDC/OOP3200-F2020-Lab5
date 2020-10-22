@@ -1,10 +1,17 @@
+//Name:             Ahmed Butt, Muzhda Ehsan
+//Student ID:       100770449, 100770164
+//Last Modified:    October 22, 2020
+//File:				OOP3200-F2020-Lab5
+
 #include <iomanip>
 #include <iostream>
+#include <map>
+#include <fstream>
+#include <cstdlib>
+#include <vector>
 
 
 #include "Vector2D.h"
-
-
 
 int main()
 {
@@ -13,47 +20,81 @@ int main()
 		/************************
 		 *	DECLARATIONS
 		 ************************/
+		std::map<std::string, Vector2D<float>*> vector_map; //I'm the map
+		auto* def = new Vector2D<float>(); //default (0, 0) point
+		std::ifstream infile;
+		std::string fileName;
+
+		std::cout << "Enter the name of the file you wish to open: ";
+		std::cin >> fileName;
+		infile.open(fileName.c_str());
 		
+		if (infile.fail()) //if file doesn't exist
+		{
+			std::cout << "\n" << fileName << " could not be opened for input. Check that the file exists.\n";
+		}
+		else if (infile.peek() == std::ifstream::traits_type::eof()) //if file is empty
+		{
+			std::cout << "\n" << fileName << " is empty. Check that the file contains valid data in the correct format.\n";
+		}
+		else //file found and opened
+		{
+			float x, y, totalDistance = 0;
+			std::string pointLabel;
+			int totalPoints = 0;
+			std::vector<std::string> pointLabels;
+			
+			//Check number of points and find total distance
+			while (!infile.fail())
+			{
+				infile >> pointLabel;
+				infile.ignore(1, ' ');
+				infile.ignore(1, '(');
+				infile >> x;
+				infile.ignore(1, ',');
+				infile.ignore(1, ' ');
+				infile >> y;
+				infile.ignore(1, ')');
 
+				if (infile.eof()) //if end of file has been reached (prevent duplicate output and incrementation)
+				{
+					break;
+				}
 
-		
-		/******************************************************************************
-		 *	Reading Labels/Points into the Map:
-		 *	Attempt to open the data file.  If the data file opens, read a label,
-		 *	followed by a point and insert them into the map using the label as the key.
-		 *	Repeat until all the data is read and close the file. If the data file did
-		 *	not open, tell the user and remind them to check that the file exists. If
-		 *	the file opened but the map is empty after the input loop, report that to
-		 *	the user and remind them to check that the file contains valid data in
-		 *	the correct format. Only continue processing if the file was opened and the
-		 *	map is not empty.
-		 ******************************************************************************/
+				std::cout << pointLabel << " " << "(" << x << ", " << y << ")\n"; //show all points
 
-		
+				totalPoints++; //increment to keep track of total points
 
-		/******************************************************************************
-		 *	Determine the Total Distance Between All Points in Order:
-		 *	Use an iterator and a loop to traverse each label/point in the map. For
-		 *	each label/point, determine the distance from that point to the previous
-		 *	point (or next point depending on how you implement this) and add that
-		 *	distance to a total.  Note that the Vector2D class includes a static 
-		 *	distance function to determine the distance between two Vector2D
-		 *	objects, so you should not need to use any complicated math here.  Report
-		 *	to the user how many points the map contains and what the total distance is.
-		 ******************************************************************************/
-
+				pointLabels.resize(totalPoints);
+				pointLabels.push_back(pointLabel);
 				
+				auto* temp_vector = new Vector2D<float>(x, y);
+				vector_map[pointLabel] = temp_vector;
+				
+				totalDistance += Vector2D<float>::Distance(*def,*temp_vector); //add distances
+			}
+			std::cout << "\n" << "The map contains " << totalPoints << " points for a total distance of " << totalDistance << ".\n";
+			
+			//User input loop
+			std::string userInput;
 
-		/******************************************************************************
-		 *	Determine the Distance Between the Start Point and a User Selected Point:
-		 *	Prompt the user to enter a label or to enter "quit" to end.  If the user
-		 *	entered anything other than "quit", attempt to find the label they entered
-		 *	in the map. If it was found, report the distance between the point for the
-		 *	label they entered and the start point (i.e. the point labeled "AA").
-		 *	Otherwise, tell the user that the label they entered is not in the map.
-		 *	Repeat these steps until the user enters "quit".
-		 ******************************************************************************/
-		
+			while (userInput != "quit")
+			{
+				std::cout << "\nEnter the label of the point you wish to go to (\"quit\" to end): ";
+				std::cin >> userInput;
+
+				for (const auto& current_vector : vector_map)
+				{
+					if (userInput == current_vector.first)
+					{
+						const auto x2 = current_vector.second->GetX(), y2 = current_vector.second->GetY();
+						const auto distance = Vector2D<float>::Distance(*def,*current_vector.second);
+						std::cout << "The distance between AA (0, 0) and " << current_vector.first << " (" << x2 << ", " << y2 << ")" << " is " << distance;
+						break;
+					}
+				}
+			}
+		}	
 	}
 	/******************************************************************************
 	 *	Exception Handling:
@@ -62,7 +103,7 @@ int main()
 	 ******************************************************************************/
 	catch(...)  // an exception was thrown
 	{
-		
+		std::cout << "An error occurred at run-time: ";
 	}
 
 	// END-OF-PROGRAM
