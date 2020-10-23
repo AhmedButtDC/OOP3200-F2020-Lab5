@@ -22,6 +22,7 @@ int main()
 		 ************************/
 		std::map<std::string, Vector2D<float>*> vector_map; //I'm the map
 		auto* def = new Vector2D<float>(); //default (0, 0) point
+		bool notFound = false;
 		std::ifstream infile;
 		std::string fileName;
 
@@ -61,7 +62,7 @@ int main()
 					break;
 				}
 
-				std::cout << pointLabel << " " << "(" << x << ", " << y << ")\n"; //show all points
+				//std::cout << pointLabel << " " << "(" << x << ", " << y << ")\n"; //show all points
 
 				totalPoints++; //increment to keep track of total points
 
@@ -72,12 +73,15 @@ int main()
 				vector_map[pointLabel] = temp_vector;
 				
 				totalDistance += Vector2D<float>::Distance(*def,*temp_vector); //add distances
+
+				def = temp_vector; //change default Vector2D to old Vector2D so next increment finds distance between old and new
 			}
 			std::cout << "\n" << "The map contains " << totalPoints << " points for a total distance of " << totalDistance << ".\n";
 			
 			//User input loop
 			std::string userInput;
-
+			*def = Vector2D<float>();
+			
 			while (userInput != "quit")
 			{
 				std::cout << "\nEnter the label of the point you wish to go to (\"quit\" to end): ";
@@ -89,25 +93,30 @@ int main()
 					{
 						const auto x2 = current_vector.second->GetX(), y2 = current_vector.second->GetY();
 						const auto distance = Vector2D<float>::Distance(*def,*current_vector.second);
-						std::cout << "The distance between AA (0, 0) and " << current_vector.first << " (" << x2 << ", " << y2 << ")" << " is " << distance;
+						std::cout << "The distance between AA (0, 0) and " << current_vector.first << " (" << x2 << ", " << y2 << ")" << " is " << distance << ".\n";
+						notFound = false;
 						break;
 					}
+					else
+					{
+						notFound = true;
+					}
+				}
+				if (notFound && userInput != "quit")
+				{
+					std::cout << "There is no point labeled \"" << userInput << "\" in the map.\n";
 				}
 			}
-		}	
+		}
 	}
-	/******************************************************************************
-	 *	Exception Handling:
-	 *	Catch any std::exception thrown. Report to the user that a run-time error
-	 *	occurred and show what exception was thrown.
-	 ******************************************************************************/
 	catch(...)  // an exception was thrown
 	{
 		std::cout << "An error occurred at run-time: ";
 	}
 
+	std::cout << "\n--------------------------------------------------------------------";
+
 	// END-OF-PROGRAM
-	
 	return 0;
 }
 
