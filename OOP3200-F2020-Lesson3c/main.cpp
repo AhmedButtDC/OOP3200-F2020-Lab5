@@ -8,7 +8,6 @@
 #include <map>
 #include <fstream>
 #include <cstdlib>
-#include <vector>
 
 #include "Vector2D.h"
 
