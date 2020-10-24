@@ -69,6 +69,10 @@ int main()
 				
 				totalDistance += Vector2D<float>::Distance(*def,*temp_vector); //add distances
 
+				//This displays the points that are having their distances between each other added up
+				//std::cout << "\n" << "(" << def->GetX() << ", " << def->GetY() << ") ";
+				//std::cout << "(" << temp_vector->GetX() << ", " << temp_vector->GetY() << ") ";
+
 				def = temp_vector; //change default Vector2D to old Vector2D so next increment finds distance between old and new
 			}
 			
